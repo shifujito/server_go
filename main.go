@@ -1,13 +1,67 @@
 package main
 
 import (
+	"html/template"
+	"log"
 	"net/http"
 )
 
-func main() {
-	hh := func(w http.ResponseWriter, rq *http.Request) {
-		w.Write([]byte("Hello, This is go server"))
+type Temps struct {
+	notemp *template.Template
+	indx   *template.Template
+	helo   *template.Template
+}
+
+func notemp() *template.Template {
+	src := "<html><body><h1>No TEMPLATE.</h1></body></html>"
+	tmp, _ := template.New("index").Parse(src)
+	return tmp
+}
+
+func setupTemp() *Temps {
+	temps := new(Temps)
+	temps.notemp = notemp()
+
+	indx, er := template.ParseFiles("templates/index.html")
+
+	if er != nil {
+		indx = temps.notemp
 	}
-	http.HandleFunc("/hello", hh)
+	temps.indx = indx
+
+	helo, er := template.ParseFiles("templates/hello.html")
+
+	if er != nil {
+		helo = temps.notemp
+	}
+	temps.helo = helo
+
+	return temps
+}
+
+func index(w http.ResponseWriter, rq *http.Request, tmp *template.Template) {
+	er := tmp.Execute(w, nil)
+	if er != nil {
+		log.Fatal(er)
+	}
+}
+
+func hello(w http.ResponseWriter, rq *http.Request, tmp *template.Template) {
+	er := tmp.Execute(w, nil)
+	if er != nil {
+		log.Fatal(er)
+	}
+}
+func main() {
+	temps := setupTemp()
+
+	http.HandleFunc("/", func(w http.ResponseWriter, rq *http.Request) {
+		index(w, rq, temps.indx)
+	})
+
+	http.HandleFunc("/hello", func(w http.ResponseWriter, rq *http.Request) {
+		hello(w, rq, temps.helo)
+	})
+
 	http.ListenAndServe("", nil)
 }
