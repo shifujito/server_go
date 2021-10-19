@@ -48,11 +48,12 @@ func index(w http.ResponseWriter, rq *http.Request, tmp *template.Template) {
 
 func hello(w http.ResponseWriter, rq *http.Request, tmp *template.Template) {
 	item := struct {
-		Title   string
-		Message string
+		Title    string
+		Items    []string
+		JMessage string
 	}{
-		Title:   "Send values",
-		Message: "this is sample message.<br>これはサンプルです",
+		Title: "Send values",
+		Items: []string{"one", "two", "three"},
 	}
 	er := tmp.Execute(w, item)
 	if er != nil {
