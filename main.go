@@ -47,19 +47,22 @@ func index(w http.ResponseWriter, rq *http.Request, tmp *template.Template) {
 }
 
 func hello(w http.ResponseWriter, rq *http.Request, tmp *template.Template) {
+	id := rq.FormValue("id")
+	nm := rq.FormValue("name")
+	msg := "id :" + id + "name" + nm
 	item := struct {
-		Title    string
-		Items    []string
-		JMessage string
+		Title   string
+		Message string
 	}{
-		Title: "Send values",
-		Items: []string{"one", "two", "three"},
+		Title:   "Send Value",
+		Message: msg,
 	}
 	er := tmp.Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
 	}
 }
+
 func main() {
 	temps := setupTemp()
 
